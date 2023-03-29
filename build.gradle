@@ -1,0 +1,92 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id("java-library")
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    id("xyz.jpenilla.run-paper") version "2.0.1"
+}
+
+group = 'com.wojson'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+    mavenLocal()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+
+    maven { url = uri("https://repo.panda-lang.org/releases") }
+    maven { url = uri("https://repo.eternalcode.pl/releases") }
+    maven { url = uri("https://maven.enginehub.org/repo") }
+}
+
+dependencies {
+    // SpigotAPI
+    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+
+    // Kyori Adventure
+    implementation('net.kyori:adventure-platform-bukkit:4.3.0')
+    implementation('net.kyori:adventure-text-minimessage:4.13.0')
+
+    // LiteCommands
+    implementation("dev.rollczi.litecommands:bukkit-adventure:2.7.0")
+
+    // Cdn
+    implementation('net.dzikoysk:cdn:1.14.4')
+
+    // bStats
+    implementation('org.bstats:bstats-bukkit:3.0.1')
+
+    // io.github.mineflash07/discord-webhook
+    implementation("io.github.mineflash07:discord-webhook:1.0.1")
+}
+
+def targetJavaVersion = 17
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+bukkit {
+    main = "com.wojson.reports.Reports"
+    apiVersion = "1.18"
+    prefix = "Reports"
+    author = "Wojson"
+    name = "Reports"
+    description = "A simple plugin for send report to administration"
+    version = "${project.version}"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}

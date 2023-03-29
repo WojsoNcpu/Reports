@@ -1,0 +1,7 @@
+name: Reports
+version: 1.0-SNAPSHOT
+main: com.wojson.reports.Reports
+description: A simple plugin for send report to administration
+author: Wojson
+prefix: Reports
+api-version: 1.18
